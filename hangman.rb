@@ -11,15 +11,10 @@ class Hangman
   end
 
   def generate_secret_word
-    begin
-      file = File.open("google-10000-english-no-swears.txt", "r")
-      words = file.readlines.map(&:chomp).select { |word| word.length.between?(@min_length, @max_length) }
-      return words.sample.upcase
-    rescue IOError => e
-      puts "An error occurred while reading the file: #{e.message}"
-    ensure
-      file.close if file
-    end
+    words = File.readlines("google-10000-english-no-swears.txt").map(&:chomp).select { |word| word.length.between?(@min_length, @max_length) }
+    words.sample.upcase
+  rescue IOError => e
+    puts "An error occurred while reading the file: #{e.message}"
   end
 
   def guess
@@ -72,10 +67,10 @@ class Hangman
   end
 
   def end?
-    if @remaining_guesses == 0
+    if @remaining_guesses.zero?
       display_defeat
       true
-    elsif @secret_word == @mask.gsub(' ', '')
+    elsif @secret_word == @mask.delete(' ')
       display_win
       true
     else
